@@ -1,13 +1,26 @@
 const swipl = require('swipl-stdio');
-// Engine represents one SWI-Prolog process.
-const engine = new swipl.Engine();
-(async () => {
-    const result = await engine.call('member(X, [1,2,3,4])');
-    if (result) {
-        console.log(`Variable X value is: ${result.X}`);
-    } else {
-        console.log('Call failed.');
+
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 8080;
+
+app.get('/', async (req, res) => {
+    try {
+        const engine = new swipl.Engine();
+        const result = await engine.call('member(X, [1,2,3,4])');
+        if (result) {
+            res.send(`Variable X value is: ${result.X}`);
+            console.log("Success!");
+        } else {
+            res.send('Call failed.');
+            console.log("Failure.")
+        }
+        // Either run more queries or stop the engine.
+        engine.close();
+    } catch(error) {
+        res.send(error)
+        console.log(error)
     }
-    // Either run more queries or stop the engine.
-    engine.close();
-})().catch((err) => console.log(err));
+})
+
+app.listen(port, () => console.log(`App listening on port ${port}!`))
