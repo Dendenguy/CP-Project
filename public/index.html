@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Constraint Programming Project</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="js/main.js"></script>
+    </head>
+    <body>
+        <div>
+            <div class="jumbotron text-center" style="margin-bottom:0">
+                <h1>Constraint Programming Project</h1>
+            </div>
+            <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                    <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Schedule</a>
+                    </li>   
+                    </ul>
+                </div>  
+            </nav>
+        </div>
+        <div class='container-fluid' style="margin-top:30px;padding-bottom:300px">
+            <div class="row container-fluid justify-content-center" style="margin-bottom:70px">
+                <div class="col-8">
+                    <h3 class="text-center" style="margin-bottom:30px">Edges</h3>
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr class='d-flex'>
+                                <th class="col-1">#</th>
+                                <th class="col-2">From</th>
+                                <th class="col-2">To</th>
+                                <th class="col-2">Length</td>
+                                <th class="col-2">Type</th>
+                                <th class="col-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="edges">
+                            <tr class="d-flex">
+                                <td class="col-1"></td>
+                                <td class="col-2"><input id="fromVertex" data-toggle="tooltip" data-placement="top" title="From Vertex" type="text" class="form-control form-control-sm" placeholder='a'></td>
+                                <td class="col-2"><input id="toVertex" data-toggle="tooltip" data-placement="top" title="To Vertex" type="text" class="form-control form-control-sm" placeholder='b'></td>
+                                <td class="col-2"><input id="edgeLength" data-toggle="tooltip" data-placement="top" title="Edge length in minutes" type="text" class="form-control form-control-sm" placeholder='60'></td>
+                                <td class="col-2"><select id="edgeType" data-toggle="tooltip" data-placement="top" title="Single or Double railway type" class="form-control form-control-sm"><option>Single</option><option>Double</option></select></td>
+                                <td class="col-3"><button id="addEdgeButton" type="button" class="btn btn-primary" onclick="addEdgeHandler()">Add</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row container-fluid justify-content-center" style="margin-bottom:70px">
+                <div class="col-8">
+                    <h3 class="text-center" style="margin-bottom:30px">Trains</h3>
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                            <tr class="d-flex">
+                                <th class="col-1">#</th>
+                                <th class="col-2">From</th>
+                                <th class="col-2">To</th>
+                                <th class="col-2" >Release Time</th>
+                                <th class="col-2">Due Time</th>
+                                <th class="col-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trains">
+                            <tr class="d-flex">
+                                <td class="col-1"></td>
+                                <td class="col-2"><input id="fromStation" type="text" data-toggle="tooltip" data-placement="top" title="Train starting station" class="form-control form-control-sm" placeholder='a'></td>
+                                <td class="col-2"><input id="toStation" data-toggle="tooltip" data-placement="top" title="Train destination" type="text" class="form-control form-control-sm" placeholder='b'></td>
+                                <td class="col-2"><input id="releaseTime" data-toggle="tooltip" data-placement="top" title="Train release time in minutes" type="text" class="form-control form-control-sm" placeholder='0'></td>
+                                <td class="col-2"><input id="dueTime" data-toggle="tooltip" data-placement="top" title="Train desired due time in minutes" type="text" class="form-control form-control-sm" placeholder='360'></td>
+                                <td class="col-3"><button type="button" class="btn btn-primary" onclick="addTrainHandler()">Add</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-row container-fluid justify-content-center" style="margin-top:100px">
+                <div class="form-group">
+                    <button type="button" class="btn btn-lg btn-primary"  onclick="loadExample()">Load example</button>
+                    <button type="button" class="btn btn-lg btn-warning"  onclick="clearTrains();clearEdges()">Clear</button>
+                    <button type="button" class="btn btn-lg btn-primary"  onclick="schedule()">Schedule</button>
+                </div>
+                    
+            </div>
+
+        </div>
+        <div class="modal" id="scheduleModal">
+            <div class="modal-dialog modal-dialog-centered modal-lg" style="min-width: 90%!important">
+                <div class="modal-content" style="height: 90vh!important">
+                    <div class="modal-header" style="min-height:10%">
+                        <h5 class="modal-title" id="exampleModalLabel">Train Departures</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="overflow: auto">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tablePane">Table</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#graphPane">Graph</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tablePane" style="padding-top:30px">
+                                
+                            </div>
+                            <div class="tab-pane fade" id="graphPane" style="padding-top:30px">Graph</div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="min-height:10%">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div id="errorModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content" >
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="errorMessage" class="modal-body bg-warning">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+<html>

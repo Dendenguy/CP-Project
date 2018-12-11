@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4",
+    "body-parser": "^1.18.3",
     "debug": "^2.6.4",
+    "express": "^4.16.4",
     "split": "^1.0.0"
   }
 }
