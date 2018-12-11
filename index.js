@@ -7,6 +7,10 @@ const port = process.env.PORT || 8080;
 app.get('/', async (req, res) => {
     try {
         const engine = new swipl.Engine();
+        const test = await engine.call("[project_cp]")
+        console.log(test)
+        const train = await engine.call("schedule_trains(L, S)")
+        console.log(JSON.stringify(train))
         const result = await engine.call('member(X, [1,2,3,4])');
         if (result) {
             res.send(`Variable X value is: ${result.X}`);
