@@ -170,7 +170,8 @@ function populateSchedule(response) {
             let stop = trainRoute[j]
             let previousArrivalTime = j > 1?trainRoute[j-1].arrivalTime:stop.departureTime
             let toolTipText = `Arrived at ${stop.from} at: <b>${previousArrivalTime}m</b><br>`
-            toolTipText += `Waited at ${stop.from} for: <b>${stop.departureTime - previousArrivalTime}m</b><br>`
+            if (stop.departureTime - previousArrivalTime > 0)
+                toolTipText += `Waited at ${stop.from} for: <b>${stop.departureTime - previousArrivalTime}m</b><br>`
             toolTipText += `Departed from ${stop.from} at: <b>${stop.departureTime}m</b>`
             routeHead.append(`<th class='col-2'>${stop.from}</th>`)
             routeRow.append(`<td class='col-2' data-toggle="tooltip" data-placement="top" title="${toolTipText}">${stop.departureTime}</td>`)
@@ -187,13 +188,15 @@ function populateSchedule(response) {
 
 function schedule() {
     if (edges.length > 0 && trains.length > 0) {
+        $("#scheduleButton").html("<i class='fa fa-circle-o-notch fa-spin'></i> Scheduling").attr("disabled", "disabled");
         vertexNames = Object.getOwnPropertyNames(vertices)
         $.ajax({
             url: "schedule/",
             method: "POST",
             data: JSON.stringify({edges: edges, trains: trains, vertices: vertexNames}),
             contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            dataType: "json",
+            timeout: 0
         }).done(function(response) {
             if (response.success) {
                 populateSchedule(response.result)
@@ -208,7 +211,9 @@ function schedule() {
             } else
                 showAlert("Unexpected Error: " + response.statusText)
             console.log(response)
-        }) 
+        }).always(() => {
+            $("#scheduleButton").removeAttr("disabled").html("Schedule")
+        })
     } else {
         showAlert("Please add edges and trains above before scheduling")
     }
@@ -250,6 +255,8 @@ const exampleEdges = [
 ]
 
 function loadExample() {
+    clearEdges()
+    clearTrains()
     for (let edge of exampleEdges) {
         addEdge(edge[0], edge[1], edge[2], edge[3])
     }

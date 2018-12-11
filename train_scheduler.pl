@@ -11,7 +11,6 @@ schedule_trains(L, Sum):-
 	check_same_direction(Flat),
 	get_departures(Flat, D),
 	tardiness(L, 1, Sum),
-	!,
 	labeling([ff, min(Sum)], [Sum|D]). 
 
 %Release Time constraint for each train

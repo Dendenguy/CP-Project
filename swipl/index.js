@@ -161,6 +161,9 @@ class Engine {
     close() {
         this.swipl.kill();
         this.state.setClosed();
+        if (this.query && this.query.state.isWaiting()) {
+            this.query.deferred.reject("Engine was closed.");
+        }
     }
 
     _sendQuery(string) {

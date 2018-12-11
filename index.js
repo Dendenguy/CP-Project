@@ -29,19 +29,41 @@ app.post('/schedule', async (req, res) => {
             await engine.call(`assert(train(${train.id}, ${train.releaseTime}, ${train.dueTime},${train.from}, ${train.to}))`)
         }
         await engine.call(`assert(num_trains(${trains.length}))`)
+        
 
+        console.log("================================================")
+        console.log(new Date())
+        console.dir(trains, {depth: 1000})
+        console.dir(edges, {depth: 1000})
+
+        const timeout = setTimeout(() => {
+            engine.close()
+            res.send({success: false, error: "Prolog query took too long to complete."})
+            console.log("Timeout")
+            console.log("================================================")
+        }, 1.5*60*1000)
+        
         let result = await engine.call("schedule_trains(Schedule, Tardiness)")
-        if (result) {
-            result = parsePrologResult(result)
-            res.send({success: true, result: result})
-        } else {
-            res.send({success: false, error: "Failed to schedule the trains as the prolog goal failed."})
-        }
+        
+        if (!engine.state.isClosed()) {
+            clearTimeout(timeout)
+            if (result) {
+                result = parsePrologResult(result)
+                console.dir(result, {depth: 1000})
+                res.send({success: true, result: result})
+            } else {
+                res.send({success: false, error: "Failed to schedule the trains as the prolog goal failed."})
+                console.log("Result: false")
+            }
+            console.log("================================================")
+        }        
         
     } catch(error) {
-        res.send({success: false, error: "Internal Server Error: " + error.message})
+        if (!res.headersSent) {
+            res.send({success: false, error: "Internal Server Error: " + error.message})
+        }
         console.log(error)
     }
 })
 
-app.listen(port, () => console.log(`App listening on port ${port}!`))
+app.listen(port, () => console.log(`App started on port ${port}!`))
