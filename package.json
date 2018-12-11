@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
-    "swipl-stdio": "^1.0.3"
+    "debug": "^2.6.4",
+    "split": "^1.0.0"
   }
 }
