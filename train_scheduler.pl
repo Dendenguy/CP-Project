@@ -1,5 +1,5 @@
 :- use_module(library(clpfd)).
-:- dynamic edge/4, train/2, vertices/1, num_trains/1, rpath/2.
+:- dynamic edge/4, train/5, vertices/1, num_trains/1, rpath/2.
 
 schedule_trains(L, Sum):-
 	num_trains(N),

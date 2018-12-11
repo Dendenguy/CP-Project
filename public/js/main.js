@@ -142,6 +142,7 @@ function populateSchedule(response) {
     const tablePane = $("#tablePane")
     tablePane.empty()
     const schedule = response.schedule
+    const tardiness = response.tardiness
     for (let i = 0; i < schedule.length; i++) {
         let trainRoute = schedule[i]
         const element = $(`
@@ -165,11 +166,23 @@ function populateSchedule(response) {
         
         const routeHead = $(`#tablePane #routeHead-${i}`)
         const routeRow = $(`#tablePane #routeRow-${i}`)
-        for (let stop of trainRoute) {
+        for (let j = 0; j < trainRoute.length; j++) {
+            let stop = trainRoute[j]
+            let previousArrivalTime = j > 1?trainRoute[j-1].arrivalTime:stop.departureTime
+            let toolTipText = `Arrived at ${stop.from} at: <b>${previousArrivalTime}m</b><br>`
+            toolTipText += `Waited at ${stop.from} for: <b>${stop.departureTime - previousArrivalTime}m</b><br>`
+            toolTipText += `Departed from ${stop.from} at: <b>${stop.departureTime}m</b>`
             routeHead.append(`<th class='col-2'>${stop.from}</th>`)
-            routeRow.append(`<td class='col-2'>${stop.departureTime}</td>`)
-        }        
+            routeRow.append(`<td class='col-2' data-toggle="tooltip" data-placement="top" title="${toolTipText}">${stop.departureTime}</td>`)
+            if (j == trainRoute.length-1) {
+                routeHead.append(`<th class='col-3'>${stop.to}</th>`)
+                routeRow.append(`<td class='col-3'>${stop.arrivalTime} - Finished</td>`)
+            }
+        }
+              
     }
+    tablePane.append(`<div class='row h-100 align-items-center'><h6 class='col-6'>Total Tardiness: ${tardiness} minutes</h6></div>`)
+    $('#tablePane [data-toggle="tooltip"]').tooltip({html: true})  
 }
 
 function schedule() {
@@ -190,7 +203,10 @@ function schedule() {
                 showAlert(response.error)
             }
         }).fail(function(response) {
-            showAlert("Unexpected Error: " + response.statusText)
+            if (response.statusText == "error") {
+                showAlert("Request to API timed out.")
+            } else
+                showAlert("Unexpected Error: " + response.statusText)
             console.log(response)
         }) 
     } else {
